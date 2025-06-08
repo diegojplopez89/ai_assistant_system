@@ -1,0 +1,26 @@
+up-core:
+	docker compose --profile core up -d
+
+up-ai:
+	docker compose --profile ai up -d
+
+up-support:
+	docker compose --profile support up -d
+
+up-optional:
+	docker compose --profile optional up -d
+
+up-all:
+	docker compose --profile core --profile ai --profile support --profile optional up -d
+
+down:
+	docker compose down
+
+logs:
+	docker compose logs -f
+
+status:
+	docker compose ps
+
+rebuild:
+	docker compose build --no-cache
