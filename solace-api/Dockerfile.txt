@@ -1,0 +1,31 @@
+FROM python:3.10-slim
+
+# Install ffmpeg
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# --- Piper TTS Setup ---
+# Create directories for Piper executable and models inside the container
+RUN mkdir -p /app/piper_models /usr/local/bin
+
+# Copy the Piper executable from your local 'piper' subfolder to '/usr/local/bin' in the image
+COPY piper/piper /usr/local/bin/piper
+RUN chmod +x /usr/local/bin/piper # Make it executable
+
+# Copy the voice model files from your local 'piper' subfolder to '/app/piper_models' in the image
+COPY piper/en_GB-alba-medium.onnx /app/piper_models/
+COPY piper/en_GB-alba-medium.onnx.json /app/piper_models/
+COPY piper/MODEL_CARD /app/piper_models/ # Optional, but good to have
+# --- End Piper TTS Setup ---
+
+# Continue with your Python application setup
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . . # Copies solace_apimain.py etc.
+
+EXPOSE <span class="math-inline">\{FLASK\_PORT\:\-5000\}
+ENV IS\_IN\_DOCKER True
+CMD \["waitress\-serve", "\-\-host", "</span>{FLASK_HOST:-0.0.0.0}", "--port", "${FLASK_PORT:-5000}", "solace_apimain:app"]

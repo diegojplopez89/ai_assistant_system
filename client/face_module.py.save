@@ -1,0 +1,35 @@
+import face_recognition
+import cv2
+
+def detect_faces(image_path):
+    image = face_recognition.load_image_file(image_path)
+    face_locations = face_recognition.face_locations(image)
+    return face_locations
+nano client/video_capture.py
+import cv2
+
+def record_video(output_path="output.avi", duration=5, fps=20):
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        raise Exception("Webcam not accessible")
+
+    width = int(cap.get(3))
+    height = int(cap.get(4))
+    fourcc = cv2.VideoWriter_fourcc(*"XVID")
+    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+
+    frame_count = 0
+    max_frames = duration * fps
+
+    while frame_count < max_frames:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        out.write(frame)
+        frame_count += 1
+
+    cap.release()
+    out.release()
+
+nano scripts/verify_components.py
+
